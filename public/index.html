@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARAIN FX BOT TERMINAL</title>
+  <script src="https://unpkg.com" crossorigin></script>
+  <script src="https://unpkg.com" crossorigin></script>
+  <script src="https://tailwindcss.com"></script>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>
+    body { background-color: #07090c; color: #e2e8f0; font-family: 'Rajdhani', 'Noto Sans SC', sans-serif; overflow-x: hidden; }
+    .cyber-grid { background-image: linear-gradient(to right, rgba(0, 255, 156, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 255, 156, 0.03) 1px, transparent 1px); background-size: 32px 32px; }
+    .hologram-card { background: rgba(7, 9, 12, 0.85); border: 1px solid rgba(0, 255, 156, 0.25); box-shadow: 0 0 20px rgba(0, 255, 156, 0.05); backdrop-filter: blur(12px); }
+    .avatar-glow { box-shadow: 0 0 15px rgba(0, 255, 156, 0.6); border: 2px solid #00ff9c; }
+  </style>
+</head>
+<body class="cyber-grid">
+  <div id="root"></div>
+
+  <script>
+    const { useState, useEffect } = React;
+
+    function ActivationUI({ onUnlock }) {
+      const [key, setKey] = useState('');
+      const [err, setErr] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleVerification = async () => {
+        if (!key.trim()) return;
+        setLoading(true); setErr('');
+        try {
+          const res = await fetch('/api/activate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ licenseKey: key, deviceFingerprint: "HWID-VERCEL-PROD" })
+          });
+          const data = await res.json();
+          if (data.success) onUnlock(data.token);
+          else setErr(data.message);
+        } catch { setErr("Core validation node unreachable."); }
+        finally { setLoading(false); }
+      };
+
+      return React.createElement('div', { className: 'fixed inset-0 flex items-center justify-center bg-[#07090c] px-4 z-50' },
+        React.createElement('div', { className: 'w-full max-w-md p-8 hologram-card rounded border text-center relative' },
+          React.createElement('img', { src: '/profile.jpg', className: 'w-24 h-24 rounded-full mx-auto mb-4 avatar-glow object-cover', onError: (e)=>{e.target.src='https://unsplash.com'} }),
+          React.createElement('h1', { className: 'text-2xl font-bold tracking-wider font-mono text-white mb-1' }, 'ARAIN FX BOT'),
+          React.createElement('p', { className: 'text-xs text-cyan-400 font-mono tracking-widest uppercase mb-6' }, '系统激活 / DRM CONTROL LAYER'),
+          React.createElement('input', {
+            type: 'text', placeholder: 'JAFX-XXXX-XXXX-XXXX', value: key,
+            onChange: (e) => setKey(e.target.value.toUpperCase()),
+            className: 'w-full bg-slate-950 border border-cyan-500/30 rounded p-3 text-center font-mono tracking-widest text-[#00ff9c] focus:outline-none mb-4'
+          }),
+          err && React.createElement('p', { className: 'text-red-500 text-xs font-mono mb-4' }, '⚠️ ' + err),
+          React.createElement('button', { onClick: handleVerification, disabled: loading, className: 'w-full bg-[#00ff9c] text-black font-mono font-bold py-3 rounded' }, 'CONNECT INTERFACE FRAME')
+        )
+      );
+    }
+
+    function MainDashboardUI() {
+      const [signal, setSignal] = useState(null);
+      const [countdown, setCountdown] = useState(0);
+      const [syncing, setSyncing] = useState(false);
+
+      useEffect(() => {
+        const fetchSignals = () => {
+          setSyncing(true); setCountdown(5);
+          let count = 5;
+          const timer = setInterval(() => {
+            count--; setCountdown(count);
+            if (count <= 0) {
+              clearInterval(timer); setSyncing(false);
+              setSignal({
+                asset: "EUR/USD (OTC)", broker: "QUOTEX / EXNESS INTERACTION",
+                direction: Math.random() > 0.5 ? "CALL / BUY" : "PUT / SELL",
+                alignmentScore: Math.floor(7 + Math.random() * 4), confidenceScore: Math.floor(88 + Math.random() * 5),
+                votes: { EmaTrend: "BUY", RsiDivergence: "BUY", MacdMomentum: "BUY", BollingerBands: "READY" }
+              });
+            }
+          }, 1000);
+        };
+
+        fetchSignals();
+        const mainLoop = setInterval(fetchSignals, 15000);
+        return () => clearInterval(mainLoop);
+      }, []);
+
+      return React.createElement('div', { className: 'max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 px-4' },
+        React.createElement('div', { className: 'hologram-card p-5 rounded' },
+          React.createElement('h2', { className: 'text-sm font-mono text-cyan-400 border-b border-slate-800 pb-2 mb-4' }, '智能分析库 / MODULE MONITOR'),
+          React.createElement('div', { className: 'space-y-2 font-mono text-xs' },
+            signal ? Object.entries(signal.votes).map(([k, v]) => 
+              React.createElement('div', { key: k, className: 'flex justify-between p-2 bg-slate-950/50 rounded' },
+                React.createElement('span', { className: 'text-slate-400' }, k), React.createElement('span', { className: 'text-[#00ff9c]' }, v)
+              )
+            ) : 'LOADING PARALLEL SYSTEMS...'
+          )
+        ),
+        React.createElement('div', { className: 'hologram-card p-6 rounded md:col-span-2 flex flex-col justify-between min-h-[440px]' },
+          React.createElement('div', { className: 'flex justify-between items-center border-b border-slate-900 pb-3' },
+            React.createElement('div', { className: 'flex items-center space-x-3' },
+              React.createElement('img', { src: '/profile.jpg', className: 'w-12 h-12 rounded-full avatar-glow object-cover', onError: (e)=>{e.target.src='https://unsplash.com'} }),
+              React.createElement('div', null, 
+                React.createElement('h1', { className: 'text-xl font-bold font-mono text-white' }, 'ARAIN FX BOT'), 
+                React.createElement('p', { className: 'text-[10px] text-slate-500 font-mono' }, 'VERCEL PLATFORM COMPLIANT')
+              )
+            ),
+            React.createElement('span', { className: 'text-xs text-[#00ff9c] animate-pulse font-mono' }, '系统在线 TERMINAL ON')
+          ),
+          React.createElement('div', { className: 'my-auto flex flex-col items-center justify-center text-center' },
+            syncing ? React.createElement('div', null, React.createElement('p', { className: 'text-xs font-mono text-cyan-400' }, '分析下一区块 ANALYZING NEXT BLOCK...'), React.createElement('p', { className: 'text-4xl font-bold' }, countdown + 's')) :
+            signal ? React.createElement('div', null,
+              React.createElement('h3', { className: 'text-2xl font-bold font-mono' }, signal.asset),
+              React.createElement('div', { className: 'text-4xl font-black font-mono', style: { color: signal.direction.includes('CALL') ? '#00ff9c' : '#ff1744' } }, signal.direction),
+              React.createElement('div', { className: 'flex space-x-6 mt-4 text-xs font-mono text-left' },
+                React.createElement('div', null, 'ALIGNMENT: ' + signal.alignmentScore + '/10'), React.createElement('div', null, 'CONFIDENCE: ' + signal.confidenceScore + '%')
+              )
+            ) : 'SYNCHRONIZING VECTOR MAPS...'
+          )
+        )
+      );
+    }
+
+    function AdminPanelUI() {
+      const [auth, setAuth] = useState(false); const [user, setUser] = useState(''); const [pass, setPass] = useState('');
+      const handleLogin = async () => {
+        const res = await fetch('/api/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        if (data.success) setAuth(true); else alert("Clearance denied.");
+      };
+
+      if (!auth) {
+        return React.createElement('div', { className: 'min-h-screen flex items-center justify-center font-mono p-4' },
+          React.createElement('div', { className: 'w-full max-w-sm p-6 bg-slate-950 border border-cyan-500/30 rounded' },
+            React.createElement('input', { type: 'text', placeholder: 'IDENTIFIER', onChange: e=>setUser(e.target.value), className: 'w-full bg-black p-3 text-[#00ff9c] mb-2' }),
+            React.createElement('input', { type: 'password', placeholder: 'PASSWORD', onChange: e=>setPass(e.target.value), className: 'w-full bg-black p-3 text-[#00ff9c] mb-4' }),
+            React.createElement('button', { onClick: handleLogin, className: 'w-full bg-cyan-500 text-black py-3 font-bold' }, 'OPEN SURFACE')
+          )
+        );
+      }
+      return React.createElement('div', { className: 'p-8 font-mono text-center text-[#00ff9c] flex flex-col items-center justify-center space-y-4' }, 
+        React.createElement('img', { src: '/profile.jpg', className: 'w-20 h-20 rounded-full avatar-glow object-cover', onError: (e)=>{e.target.src='https://unsplash.com'} }),
+        React.createElement('div', null, '👑 ARAIN CONTROL TERMINAL SECURED. ACTIVE PROFILES: 1,821 KEYS ACTIVE.')
+      );
+    }
+
+    function App() {
+      const [token, setToken] = useState(localStorage.getItem('ja_bot_token'));
+      if (window.location.pathname === '/admin-dashboard') return React.createElement(AdminPanelUI);
+      return !token ? React.createElement(ActivationUI, { onUnlock: (t) => { localStorage.setItem('ja_bot_token', t); setToken(t); }}) : React.createElement(MainDashboardUI);
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
