@@ -1,0 +1,13 @@
+{
+  "name": "arain-fx-bot",
+  "version": "1.0.0",
+  "description": "Production Ready Vercel Deployment Terminal for Arain Fx Bot",
+  "main": "api/activate.ts",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
